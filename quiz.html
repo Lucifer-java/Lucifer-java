@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programming Quiz</title>
+    <style>
+        /* General styling */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background-color: black; 
+            color: cyan;
+            user-select: none; /* Disable text selection */
+        }
+
+        .quiz-container { 
+            max-width: 600px; 
+            margin: auto; 
+            padding: 20px; 
+            border: 2px solid cyan; 
+            border-radius: 10px; 
+        }
+
+        .question { 
+            margin-bottom: 10px; 
+            color: white; 
+            font-weight: bold; 
+        }
+
+        .options { 
+            list-style-type: none; 
+            padding: 0; 
+        }
+
+        .options li { 
+            margin: 5px 0; 
+            color: cyan; 
+        }
+
+        button { 
+            margin-top: 10px; 
+            background-color: cyan; 
+            color: black; 
+            border: none; 
+            padding: 10px; 
+            cursor: pointer; 
+            border-radius: 5px; 
+        }
+
+        button:hover { 
+            background-color: #00cccc; 
+        }
+
+        #timer { 
+            font-size: 20px; 
+            font-weight: bold; 
+            color: red; 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 9999; 
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        .input-container input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* Disable text selection and copying */
+        * {
+            -webkit-user-select: none; /* Chrome, Safari */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* Internet Explorer */
+            user-select: none;         /* Standard */
+        }
+
+        /* Allow text selection only for input fields */
+        input, button {
+            user-select: text;
+        }
+    </style>
+    <script>
+        // Disable right-click (context menu)
+        document.addEventListener("contextmenu", function(event) {
+            event.preventDefault();
+        });
+
+        // Disable keyboard shortcuts for copying
+        document.addEventListener("keydown", function(event) {
+            if ((event.ctrlKey && (event.key === 'c' || event.key === 'x' || event.key === 'u' || event.key === 's')) ||
+                (event.metaKey && (event.key === 'c' || event.key === 'x' || event.key === 'u' || event.key === 's'))) {
+                event.preventDefault();
+            }
+        });
+
+      
+       const questions = [
+    // Original 12 C questions
+    { question: "*What is the size of an int in C on a 32-bit system?", options: ["2 bytes", "4 bytes", "8 bytes", "System-dependent"], answer: "4 bytes" },
+    { question: "What is the purpose of the #define directive in C?", options: ["To define functions", "To create macros", "To declare variables", "To initialize pointers"], answer: "To create macros" },
+    { question: "Which function is used to dynamically allocate memory in C?", options: ["malloc()", "calloc()", "realloc()", "All of the above"], answer: "All of the above" },
+    { question: "*What will the following code print? <br>#include <stdio.h><br>int main()<br> { <br>int a = 5, b = 2;<br> printf(\"%d\", a % b); <br>return 0;<br> }", options: ["1", "2", "3", "0"], answer: "1" },
+    { question: "Which of the following is not a valid keyword in C?", options: ["auto", "volatile", "boolean", "register"], answer: "boolean" },
+    { question: "In C, what is the output of the following code? <br>\n#include <stdio.h><br>#define SQUARE(x) x*x<br>int main()<br> { <br>printf(\"%d\", SQUARE(3 + 1)); <br>return 0;<br> }", options: ["16", "13", "10", "Compilation error"], answer: "13" },
+    { question: "What does the continue statement do in C?", options: ["Terminates the program", "Skips the remaining statements in the loop and continues with the next iteration", "Exits the loop", "Restarts the loop from the beginning"], answer: "Skips the remaining statements in the loop and continues with the next iteration" },
+    { question: "Which header file is used for file handling in C?", options: ["string.h", "stdlib.h", "stdio.h", "conio.h"], answer: "stdio.h" },
+    { question: "What is the range of a char in C?", options: ["-128 to 127", "0 to 255", "-32768 to 32767", "None of the above"], answer: "-128 to 127" },
+    { question: "*What will happen if the following code is executed? <br>int main() <br>{<br> int a = 5; <br>printf(\"%d\", a++);<br> return 0;<br> }", options: ["Prints 6", "Prints 5", "Undefined behavior", "Error"], answer: "Prints 5" },
+    { question: "How is a null character represented in C?", options: ["'0'", "'\\n'", "'\\0'", "None of the above"], answer: "'\\0'" },
+    { question: "*What is the output of the following code? <br>\nint main()<br> { <br>int a = 10;<br> printf(\"%d\", ++a);<br> return 0;<br> }", options: ["9", "10", "11", "Undefined behavior"], answer: "11" },
+    
+    // Original 12 C++ questions
+    { question: "*What is the main feature of object-oriented programming in C++?", options: ["Encapsulation", "Inheritance", "Polymorphism", "All of the above"], answer: "All of the above" },
+    { question: "What is the correct syntax for declaring a class in C++?", options: ["class ClassName { }", "Class ClassName { }", "struct ClassName { }", "typedef ClassName { }"], answer: "class ClassName { }" },
+    { question: "Which operator is used to allocate memory dynamically in C++?", options: ["malloc", "calloc", "new", "allocate"], answer: "new" },
+    { question: "Which of the following is used to release dynamically allocated memory in C++?", options: ["delete", "free", "release", "None of the above"], answer: "delete" },
+    { question: "*What will be the output of the following code? <br>#include <iostream><br>using namespace std;<br>int main()<br> {<br> int a = 10, b = 20; <br>cout << a + b; <br>return 0;<br> }", options: ["1020", "30", "Compilation error", "None of the above"], answer: "30" },
+    { question: "What is a constructor in C++?", options: ["A special function automatically called when an object is created", "A function that initializes pointers", "A function to handle memory allocation", "None of the above"], answer: "A special function automatically called when an object is created" },
+    { question: "What will happen if a destructor is not defined in a class?", options: ["Compiler provides a default destructor", "Program fails to compile", "Runtime error occurs", "None of the above"], answer: "Compiler provides a default destructor" },
+    { question: "Which of the following is not a valid C++ keyword?", options: ["virtual", "private", "public", "null"], answer: "null" },
+    { question: "What does the keyword virtual indicate in C++?", options: ["Function cannot be overridden", "Function can be overridden in a derived class", "Variable cannot be changed", "None of the above"], answer: "Function can be overridden in a derived class" },
+    { question: "*What will the following code produce?<br> \n#include <iostream><br>\nusing namespace std;<br>\nint main()<br> {<br> cout << sizeof(\"Hello\"); <br>return 0; <br>}", options: ["4", "5", "6", "Compilation error"], answer: "6" },
+    { question: "Which of the following is true for function overloading in C++?", options: ["Functions must have the same name and parameters", "Functions must have different return types", "Functions must have different parameter types or counts", "Function overloading is not allowed"], answer: "Functions must have different parameter types or counts" },
+    { question: "*How do you define a pure virtual function?", options: ["virtual void functionName();", "virtual void functionName() = 0;", "void functionName() = virtual;", "None of the above"], answer: "virtual void functionName() = 0;" },
+    
+    // Additional 6 Java questions (6 more to make total of 30 questions)
+    { question: "What is the default value of a reference variable in Java?", options: ["0", "null", "Undefined", "None of the above"], answer: "null" },
+    { question: "*Which of these is not a valid Java keyword?", options: ["static", "private", "friend", "final"], answer: "friend" },
+    { question: "Which method is used to start a thread in Java?", options: ["run()", "start()", "execute()", "None of the above"], answer: "start()" },
+    { question: "What is the output of the following Java code? <br>\npublic class Test<br> {<br>\npublic static void main(String[] args)<br> {<br>\nint x = 10;\nSystem.out.println(++x);<br>\n}", options: ["10", "11", "9", "Compilation error"], answer: "11" },
+    { question: "Which of the following is a wrapper class in Java?", options: ["int", "double", "Integer", "All of the above"], answer: "Integer" },
+    { question: "*What is the range of the short data type in Java?", options: ["-128 to 127", "-32768 to 32767", "0 to 65535", "None of the above"], answer: "-32768 to 32767" },
+];
+
+
+        let timer;
+        let timeLeft = 1800; // 30 minutes in seconds
+
+        function shuffleQuestions() {
+            for (let i = questions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [questions[i], questions[j]] = [questions[j], questions[i]];
+            }
+        }
+
+        function loadQuiz() {
+            shuffleQuestions();
+            let quizHTML = "";
+            questions.forEach((q, index) => {
+                quizHTML += `<div class='question'>${index + 1}. ${q.question}</div>`;
+                quizHTML += `<ul class='options'>`;
+                q.options.forEach(option => {
+                    quizHTML += `<li><input type='radio' name='q${index}' value='${option}'> ${option}</li>`;
+                });
+                quizHTML += `</ul>`;
+            });
+            document.getElementById("quiz").innerHTML = quizHTML;
+            startTimer();
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    submitQuiz();
+                } else {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    document.getElementById("timer").innerText = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }
+            }, 1000);
+        }
+
+        function submitQuiz() {
+            let playerName = document.getElementById("playerName").value.trim();
+            let collegeName = document.getElementById("collegeName").value.trim();
+
+            if (playerName === "" || collegeName === "") {
+                alert("Please enter your Name and College Name before submitting.");
+                return;
+            }
+
+            let score = 0;
+            let unansweredQuestions = [];
+
+            questions.forEach((q, index) => {
+                let selected = document.querySelector(`input[name='q${index}']:checked`);
+                if (!selected) {
+                    unansweredQuestions.push(index + 1);
+                } else if (selected.value === q.answer) {
+                    score++;
+                }
+            });
+
+            if (unansweredQuestions.length > 0) {
+                alert(`Please answer all questions before submitting. Unanswered: ${unansweredQuestions.join(", ")}`);
+                return;
+            }
+
+            document.getElementById("result").innerText = `You scored ${score} out of ${questions.length}!`;
+
+            let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+            leaderboard.push({ name: playerName, college: collegeName, score: score });
+            localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+
+            window.location.href = "leaderboard.html";
+            clearInterval(timer);
+        }
+
+        window.onload = loadQuiz;
+    </script>
+</head>
+<body>
+    <div id="timer">Time Remaining: 30:00</div>
+
+    <div class="quiz-container">
+        <h2>Debugging : </h2>
+
+        <div class="input-container">
+            <input type="text" id="playerName" placeholder="Enter Your Name" required>
+            <input type="text" id="collegeName" placeholder="Enter College Name" required>
+        </div>
+
+        <div id="quiz"></div>
+        <button onclick="submitQuiz()">Submit</button>
+        <p id="result"></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: black; color: cyan; text-align: center; }
+        h2 { color: white; }
+        table { width: 80%; margin: auto; border-collapse: collapse; border: 2px solid cyan; }
+        th, td { padding: 10px; border: 1px solid cyan; }
+        th { background-color: cyan; color: black; }
+        td { background-color: black; color: cyan; }
+        button { margin-top: 20px; padding: 10px 20px; background-color: cyan; color: black; border: none; cursor: pointer; }
+        button:hover { background-color: #00bcd4; }
+    </style>
+</head>
+<body>
+    <h2>Leaderboard</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Player Name</th>
+                <th>College</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody id="leaderboard-table">
+        </tbody>
+    </table>
+
+    <button onclick="clearLeaderboard()">Clear Leaderboard</button>
+
+    <script>
+        function loadLeaderboard() {
+            let leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+            
+            // Sort leaderboard by score in descending order
+            leaderboard.sort((a, b) => b.score - a.score);
+            
+            let leaderboardHTML = "";
+            leaderboard.forEach((entry, index) => {
+                leaderboardHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${entry.name}</td>
+                        <td>${entry.college}</td>
+                        <td>${entry.score}</td>
+                    </tr>`;
+            });
+
+            document.getElementById("leaderboard-table").innerHTML = leaderboardHTML;
+        }
+
+        function clearLeaderboard() {
+            // Show a confirmation alert before clearing
+            let confirmation = confirm("Are you sure you want to clear the leaderboard?");
+            
+            if (confirmation) {
+                // Clear the leaderboard from localStorage
+                localStorage.removeItem("leaderboard");
+                // Reload the leaderboard
+                loadLeaderboard();
+            }
+        }
+
+        window.onload = loadLeaderboard;
+    </script>
+</body>
+</html>

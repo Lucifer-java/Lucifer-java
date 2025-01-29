@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Dynamo - Registration</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: black;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            flex-direction: column;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Glowing Title */
+        .glowing-text {
+            font-size: 3rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 5px;
+            position: relative;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 10px cyan, 0 0 20px white; }
+            100% { text-shadow: 0 0 20px white, 0 0 30px cyan; }
+        }
+
+        /* Form Container */
+        .form-container {
+            position: relative;
+            background: rgba(0, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 255, 255, 0.5);
+            width: 280px;
+            transition: transform 0.3s ease-in-out, width 0.3s ease-in-out, height 0.3s ease-in-out, background 0.3s ease-in-out;
+        }
+
+        /* Expand Effect */
+        .form-container:hover {
+            transform: scale(1.1);
+            width: 320px;
+            background: rgba(0, 255, 255, 0.3);
+        }
+
+        h3 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background-color: cyan;
+            color: black;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: white;
+            color: black;
+            box-shadow: 0px 0px 10px cyan;
+        }
+
+        /* Falling Binary Numbers */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Falling Binary Background -->
+    <canvas id="matrixCanvas"></canvas>
+
+    <!-- Glowing Title -->
+    <h1 class="glowing-text">DIGITAL DYNAMO</h1>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <h3>Click The Start Button</h3>
+        <input type="text" id="teamName" placeholder="Enter Your Name" required>
+        <input type="text" id="collegeName" placeholder="Enter College Name" required>
+        <button onclick="startQuiz()">Start</button>
+    </div>
+
+    <script>
+        // Matrix Rain Effect (Cyan & White)
+        const canvas = document.getElementById("matrixCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const binary = "0101010100111010101001110101010100101011";
+        const binaryArray = binary.split("");
+
+        const fontSize = 16;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = Array(columns).fill(0);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = binaryArray[Math.floor(Math.random() * binaryArray.length)];
+                
+                // Alternate between cyan and white
+                ctx.fillStyle = Math.random() > 0.5 ? "cyan" : "white";
+                ctx.font = `${fontSize}px monospace`;
+
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        // Resize canvas dynamically
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Function to Start Quiz
+        function startQuiz() {
+            let team = document.getElementById("teamName").value;
+            let college = document.getElementById("collegeName").value;
+
+            if (team === "" || college === "") {
+                alert("Please enter both YourName And CollegeName!");
+                return;
+            }
+
+            localStorage.setItem("teamName", team);
+            localStorage.setItem("collegeName", college);
+
+            window.location.href = "quiz.html"; // Redirect to Quiz Page
+        }
+
+        // Handle "Enter" key navigation
+        document.getElementById("teamName").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); 
+                document.getElementById("collegeName").focus(); // Move to next input
+            }
+        });
+
+        document.getElementById("collegeName").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); 
+                startQuiz(); // Submit form
+            }
+        });
+    </script>
+</body>
+</html>
